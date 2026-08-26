@@ -3,7 +3,7 @@ import plotly.express as px
 import pandas as pd
 
 global stat_names 
-stat_names = ["Ataque", "Velocidade", ""]
+stat_names = ["Ataque", "Velocidade", "Defesa", "Cura", "Inteligência", "Polimata"]
 
 def configure_page():
     st.set_page_config(
@@ -46,7 +46,7 @@ def configure_spider_plot():
     st.title(name, text_alignment="center")
 
     Stat_df = pd.DataFrame({
-        "r": [0,50,100,150,200,250,350],
+        "r": [stats[stat_name] for stat_name in stat_names],
         "theta": stat_names,
     })
 
