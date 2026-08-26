@@ -3,21 +3,7 @@ import plotly.express as px
 import pandas as pd
 
 global stat_names 
-stat_names = ["Vida","Defesa","Força","Velocidade","Destreza","Carisma","Energia","Inteligência"]
-
-global stat_ranges
-stat_ranges = {
-    "Vida": (0, 200, 50),
-    "Defesa": (0, 75, 10),
-    "Força": (0, 20, 10),
-    "Velocidade": (0, 20, 10),
-    "Destreza": (0, 20, 10),
-    "Carisma": (0, 20, 10),
-    "Energia": (0, 20, 10),
-    "Inteligência": (0, 20, 10),
-}
-
-
+stat_names = ["Ataque", "Velocidade", ""]
 
 def configure_page():
     st.set_page_config(
@@ -37,9 +23,10 @@ def configure_sidebar():
             stats = {
                     stat_name: st.slider(
                         stat_name,
-                        min_value=stat_ranges[stat_name][0],
-                        max_value=stat_ranges[stat_name][1],
-                        value=stat_ranges[stat_name][2],
+                        min_value=0,
+                        max_value=350,
+                        step=50,
+                        value=50,
                         key=f"stat_{stat_name}",
                     )
                     for stat_name in stat_names
@@ -59,12 +46,7 @@ def configure_spider_plot():
     st.title(name, text_alignment="center")
 
     Stat_df = pd.DataFrame({
-        "r": [
-            (stats[stat_name] - stat_ranges[stat_name][0])
-            / (stat_ranges[stat_name][1] - stat_ranges[stat_name][0])
-            * 100
-            for stat_name in stat_names
-        ],
+        "r": [0,50,100,150,200,250,350],
         "theta": stat_names,
     })
 
@@ -123,8 +105,7 @@ def load_data():
         for stat_name in stat_names:
             if stat_name in loaded_data.columns:
                 value = int(row[stat_name])
-                minimum, maximum, _ = stat_ranges[stat_name]
-                st.session_state[f"stat_{stat_name}"] = max(minimum, min(value, maximum))
+                st.session_state[f"stat_{stat_name}"] = int(row[stat_name])
 
         st.session_state["loaded_file_id"] = file_id
         st.success("Stats importados com sucesso")
