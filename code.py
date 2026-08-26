@@ -54,7 +54,7 @@ def configure_spider_plot():
         Stat_df,
         r="r",
         theta="theta",
-        range_r=[0,100],
+        range_r=[0,350],
         line_close=True,
         template="plotly_dark",
     )
