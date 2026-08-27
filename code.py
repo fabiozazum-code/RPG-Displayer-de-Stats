@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import json
 
 global stat_names 
 stat_names = ["Ataque", "Velocidade", "Defesa", "Cura", "Inteligência", "Polimata"]
@@ -72,42 +73,34 @@ def configure_spider_plot():
     )
 
 def convert_to_csv(df):
-    return pd.DataFrame([df]).to_csv(index=False).encode("utf-8")
+    return pd.DataFrame([df]).to_json(index=False).encode("utf-8")
 
 def save_data():
     data = {"name": name, **stats}
     st.download_button(label="Salvar stats",
-                        data=convert_to_csv(data),
-                        file_name=f"Stats_{name.strip()}.csv",
-                        disabled= not name.strip()
+                       data=json.dumps(data),
+                        file_name=f"Stats_{name.strip()}.json"
                        )
 
 def load_data():
     with st.sidebar:
-        uploaded_file = st.file_uploader("Importar personagem", type="csv")
+        uploaded_file = st.file_uploader("Importar personagem", type="json")
 
     if uploaded_file is None:
         return
-
-    file_id = (uploaded_file.name, uploaded_file.size)
-    if st.session_state.get("loaded_file_id") == file_id:
-        return
-
+    
     try:
-        loaded_data = pd.read_csv(uploaded_file)
-        if loaded_data.empty:
-            raise ValueError("O arquivo CSV está vazio")
+        Jason_f = pd.read_json(uploaded_file, typ="series")
 
-        row = loaded_data.iloc[0]
-        if "name" in loaded_data.columns:
-            st.session_state["character_name"] = str(row["name"])
+        if Jason_f.empty:
+            raise ValueError("O arquivo json está vazio")
+
+        st.session_state["character_name"] = str(Jason_f["name"])
 
         for stat_name in stat_names:
-            if stat_name in loaded_data.columns:
-                value = int(row[stat_name])
-                st.session_state[f"stat_{stat_name}"] = int(row[stat_name])
-
-        st.session_state["loaded_file_id"] = file_id
+            st.session_state[f"stat_{stat_name}"] = int(Jason_f[stat_name])
+        
+        
         st.success("Stats importados com sucesso")
 
     except (ValueError, TypeError, KeyError) as error:
